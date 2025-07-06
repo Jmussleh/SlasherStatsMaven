@@ -1,0 +1,27 @@
+Scream,Wes Craven,1996,111,Netflix,7.5,Slasher,10-12-2023
+Hereditary,Ari Aster,2018,127,Amazon Prime,8.2,Supernatural,10-13-2023
+The Babadook,Jennifer Kent,2014,94,Hulu,7.3,Psychological,10-14-2023
+The Conjuring,James Wan,2013,112,Max,7.5,Paranormal,10-15-2023
+The Witch,Robert Eggers,2015,92,Amazon Prime,7.0,Historical,10-16-2023
+It Follows,David Robert Mitchell,2014,100,Netflix,6.9,Supernatural,10-17-2023
+Get Out,Jordan Peele,2017,104,Hulu,8.0,Thriller,10-18-2023
+The Ring,Gore Verbinski,2002,115,Max,7.1,Curse,10-19-2023
+The Grudge,Takashi Shimizu,2004,91,Netflix,5.9,Curse,10-20-2023
+Insidious,James Wan,2010,103,Max,6.8,Astral,10-21-2023
+Midsommar,Ari Aster,2019,148,Hulu,7.1,Cult,10-22-2023
+The Cabin in the Woods,Drew Goddard,2011,95,Amazon Prime,7.0,Meta,10-23-2023
+The Texas Chain Saw Massacre,Tobe Hooper,1974,83,Shudder,7.4,Classic,10-24-2023
+The Strangers,Bryan Bertino,2008,86,Netflix,6.2,Home Invasion,10-25-2023
+Sinister,Scott Derrickson,2012,110,Hulu,6.9,Demonic,10-26-2023
+Lights Out,David F. Sandberg,2016,81,HBO Max,6.3,Paranormal,10-27-2023
+Smile,Parker Finn,2022,115,Paramount+,6.6,Psychological,10-28-2023
+The Black Phone,Scott Derrickson,2021,103,Peacock,7.0,Thriller,10-29-2023
+Evil Dead Rise,Lee Cronin,2023,96,HBO Max,6.7,Supernatural,10-30-2023
+Barbarian,Zach Cregger,2022,102,Max,7.0,Mystery,10-31-2023
+The Descent,Neil Marshall,2005,99,Amazon Prime,7.2,Claustrophobic,11-01-2023
+Hellraiser,Clive Barker,1987,94,Hulu,6.9,Gore,11-02-2023
+Candyman,Nia DaCosta,2021,91,Peacock,6.0,Urban Legend,11-03-2023
+The Others,Alejandro Amenábar,2001,104,Max,7.5,Ghost,11-04-2023
+The Invisible Man,Leigh Whannell,2020,124,HBO Max,7.1,Tech Horror,11-05-2023
+The Autopsy of Jane Doe,André Øvredal,2016,86,Shudder,6.8,Mystery,11-06-2023
+The Possession,Ole Bornedal,2012,92,Netflix,5.9,Exorcism,11-07
