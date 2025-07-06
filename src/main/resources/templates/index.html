@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--Sets the main title of the application -->
+    <title>Slasher Stats</title>
+</head>
+<body>
+<h1>Slasher Stats</h1>
+
+<!--Disaplys total account points -->
+<h2>Total Account Points: <span th:text="${accountPoints}">0</span></h2>
+
+<!--Create new scratch file from selection -->
+<h2>Upload Bulk Movies (.txt)</h2>
+<!--uses thymeleaf to set the action to upload which matches the action in the contoller-->
+<form th:action="@{/upload}" method="post" enctype="multipart/form-data">
+    <!--Set to only accept a .txt file-->
+    <input type="file" name="file" accept=".txt" required />
+    <button type="submit">Upload</button>
+</form>
+
+<!-- Form for the user to manually add a single movie -->
+<!-- Asks the user for every field for the horrorMovie object-->
+<h2>Add Movie</h2>
+<form th:action="@{/addMovie}" method="post" th:object="${movie}">
+    <label>Title: <input type="text" th:field="*{title}" /></label><br>
+    <label>Director: <input type="text" th:field="*{director}" /></label><br>
+    <label>Year: <input type="number" th:field="*{releaseYear}" /></label><br>
+    <label>Runtime: <input type="number" th:field="*{runtimeMinutes}" /></label><br>
+    <label>Platform: <input type="text" th:field="*{streamingPlatform}" /></label><br>
+    <label>Rating: <input type="number" step="0.1" th:field="*{rating}" /></label><br>
+    <label>Tags: <input type="text" th:field="*{tags}" /></label><br>
+    <label>Date: <input type="text" th:field="*{dateWatched}" placeholder="MM-DD-YYYY" /></label><br>
+
+    <button type="submit">Add Movie</button>
+</form>
+
+<!-- A formatted table for all of the movies added to the list. Also shows all fields -->
+<h2>All Movies</h2>
+<table border="1">
+    <tr>
+        <th>Title</th><th>Director</th><th>Year</th><th>Runtime</th><th>Platform</th><th>Rating</th><th>Tags</th><th>Date</th>
+    </tr>
+    <tr th:each="m : ${movies}">
+        <td th:text="${m.title}">Title</td>
+        <td th:text="${m.director}">Director</td>
+        <td th:text="${m.releaseYear}">Year</td>
+        <td th:text="${m.runtimeMinutes}">Runtime</td>
+        <td th:text="${m.streamingPlatform}">Platform</td>
+        <td th:text="${m.rating}">Rating</td>
+        <td th:text="${m.tags}">Tags</td>
+        <td th:text="${m.dateWatched}">Date</td>
+    </tr>
+</table>
+<!--Allows the user to update a movie field by entering the title.
+ The user can update any field in this form.-->
+<h2>Update Movie by Title</h2>
+<form th:action="@{/update}" method="get">
+    <input type="text" name="title" placeholder="Enter title to update" required />
+    <button type="submit">Update</button>
+</form>
+
+<!-- Allows the user to search for a movie to delete by its title -->
+<h2>Delete Movie by Title</h2>
+<!-- calls for the action searchToDelete using thymeleaf-->
+<form th:action="@{/searchToDelete}" method="get">
+    <input type="text" name="title" placeholder="Enter title to delete" required />
+    <button type="submit">Delete</button>
+</form>
+</body>
+</html>

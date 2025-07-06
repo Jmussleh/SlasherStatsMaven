@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Update Movie</title>
+</head>
+<body>
+<!--Dynmaically updates the title of the page depending on the movie-->
+<h1 th:text="'Update: ' + ${movie.title}"></h1>
+<!--Starts a form that submits updateMovie using POST-->
+<form th:action="@{/updateMovie}" method="post">
+    <!-- Hidden field for movie title -->
+    <input type="hidden" name="title" th:value="${movie.title}" />
+    <!-- Shows all fields already filled out with the previous information. Able to be updated -->
+    <label>Director: <input type="text" name="director" th:value="${movie.director}" required></label><br>
+    <label>Release Year: <input type="number" name="releaseYear" th:value="${movie.releaseYear}" required></label><br>
+    <label>Runtime (minutes): <input type="number" name="runtimeMinutes" th:value="${movie.runtimeMinutes}" required></label><br>
+    <label>Platform: <input type="text" name="streamingPlatform" th:value="${movie.streamingPlatform}" required></label><br>
+    <label>Rating (0–10): <input type="number" step="0.1" name="rating" th:value="${movie.rating}" required></label><br>
+    <label>Tags: <input type="text" name="tags" th:value="${movie.tags}"></label><br>
+    <label>Date Watched (MM-DD-YYYY): <input type="text" name="dateWatched" th:value="${movie.dateWatched}" required></label><br>
+
+    <button type="submit">Submit Changes</button>
+    <a href="/">Cancel</a>
+</form>
+
+</body>
+</html>
