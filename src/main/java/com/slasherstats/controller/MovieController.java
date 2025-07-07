@@ -1,6 +1,7 @@
 //Declares class is part of this package
 package com.slasherstats.controller;
 //imports horrorMovie and slasherStatsManager
+import com.slasherstats.model.HorrorMovieSQL;
 import com.slasherstats.model.horrorMovie;
 import com.slasherstats.service.slasherStatsManager;
 //Used for Spring
@@ -52,7 +53,7 @@ public class MovieController {
     //Adds a single movie manually
     @PostMapping("/addMovie")
     //Form fields are connected to horrorMovie object
-    public String addMovie(@ModelAttribute horrorMovie movie, Model model) {
+    public String addMovie(@ModelAttribute HorrorMovieSQL movie, Model model) {
         manager.addMovie(movie);
         //Redirects to homepage and refreshes movie list
         return "redirect:/";
@@ -68,7 +69,7 @@ public class MovieController {
 
     @GetMapping("/searchToDelete")
     public String searchToDelete(@RequestParam String title, Model model) {
-        horrorMovie movie = manager.findMovie(title);
+        HorrorMovieSQL movie = manager.findMovie(title);
         //If the movie isn't found return an error and return home
         if (movie == null) {
             model.addAttribute("error", "Movie not found");
@@ -90,7 +91,7 @@ public class MovieController {
     @GetMapping("/update")
     public String showUpdateForm(@RequestParam String title, Model model) {
         //Finds the movie by title
-        horrorMovie movie = manager.findMovie(title);
+        HorrorMovieSQL movie = manager.findMovie(title);
         //If the movie isn;t found go to home page with an error
         if (movie == null) {
             model.addAttribute("error", "Movie not found");
@@ -104,7 +105,7 @@ public class MovieController {
 
     //Accepts the update form
     @PostMapping("/updateMovie")
-    public String updateMovie(@ModelAttribute horrorMovie movie) {
+    public String updateMovie(@ModelAttribute HorrorMovieSQL movie) {
         //Uses this method to update and save the changes
         manager.updateMovie(movie);
         //Redirects to homepage and refreshes movie list
