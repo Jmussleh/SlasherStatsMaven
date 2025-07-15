@@ -1,3 +1,8 @@
+/**
+ * Service class that handles core business logic for managing horror movies.
+ * Provides CUD methods to manipulate horror movie entries
+ * and tracks user account points.
+ */
 package com.slasherstats.service;
 
 import com.slasherstats.model.HorrorMovieSQL;
@@ -17,6 +22,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Constructor for injecting a HorrorMovieRepository instance.
+ *
+ * @param repository for accessing horror movie data
+ */
 @Service
 public class slasherStatsManager {
 
@@ -29,14 +39,30 @@ public class slasherStatsManager {
         this.accountPoints = 0;
     }
 
+    /**
+     * Returns the current account points, which increase or decrease based on if movies are added or taken from the database.
+     *
+     * @return the number of account points
+     */
     public int getAccountPoints() {
         return accountPoints;
     }
 
+    /**
+     * Retrieves all horror movies from the repository.
+     *
+     * @return a list of all horror movies
+     */
     public List<HorrorMovieSQL> viewMovies() {
         return repository.findAll();
     }
 
+    /**
+     * Adds a single horror movie to the repository after validating date and rating fields.
+     *
+     * @param movie to add
+     * @return true if the movie was added successfully, false if not
+     */
     public boolean addMovie(HorrorMovieSQL movie) {
         if (movie == null) return false;
         if (!isValidDate(movie.getDateWatched())) return false;
@@ -46,6 +72,14 @@ public class slasherStatsManager {
         return true;
     }
 
+    /**
+     * Adds multiple horror movies from a TXT formatted MultipartFile.
+     *
+     * @param file the uploaded TXT file
+     * @return list of successfully added movies
+     *  * @throws java.io.IOException if reading from the MultipartFile stream fails
+     *  * @throws java.lang.NumberFormatException if numeric parsing fails for rating
+     */
     public List<HorrorMovieSQL> addBulkMovies(MultipartFile file) {
         List<HorrorMovieSQL> added = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
@@ -71,6 +105,14 @@ public class slasherStatsManager {
         return added;
     }
 
+    /**
+     * Adds multiple horror movies from a file path.
+     *
+     * @param filename the path to the CSV file
+     * @return list of successfully added movies
+     * @throws java.io.FileNotFoundException if the file does not exist at the given path
+     * @throws java.lang.NumberFormatException if parsing integers or doubles fails
+     */
     public List<HorrorMovieSQL> addBulkMovies(String filename) {
         List<HorrorMovieSQL> added = new ArrayList<>();
         try (Scanner fileScanner = new Scanner(new File(filename))) {
@@ -96,6 +138,12 @@ public class slasherStatsManager {
         return added;
     }
 
+    /**
+     * Updates an existing movie's fields based on title matching and saves the changes.
+     *
+     * @param updatedMovie a HorrorMovieSQL object with updated field values
+     * @return true if the movie was found and updated successfully, false otherwise
+     */
     public boolean updateMovie(HorrorMovieSQL updatedMovie) {
         HorrorMovieSQL existingMovie = repository.findByTitleIgnoreCase(updatedMovie.getTitle());
         if (existingMovie == null) return false;
@@ -123,10 +171,23 @@ public class slasherStatsManager {
         return true;
     }
 
+    /**
+     * Deletes a movie from the repository using its title.
+     *
+     * @param title the title of the movie to delete
+     * @return true if deletion was successful, false otherwise
+     */
     public HorrorMovieSQL findMovie(String title) {
         return repository.findByTitleIgnoreCase(title);
     }
 
+    /**
+     * Validates a date string to ensure it matches the format MM-dd-yyyy.
+     *
+     * @param date the date string to validate
+     * @return true if the date is valid, false otherwise
+     * @throws java.time.format.DateTimeParseException if the date format is invalid or unresolvable
+     */
     public static boolean isValidDate(String date) {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-uuuu")

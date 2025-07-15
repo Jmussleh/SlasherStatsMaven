@@ -23,8 +23,8 @@ public class horrorMovie {
         this.tags = tags;
         this.dateWatched = dateWatched;
     }
+    //empty constructor - needed for frameworks like Spring MVC
     public horrorMovie() {
-        // empty constructor - needed for frameworks like Spring MVC
     }
     //Getters for all fields in my horror movie object
     public String getTitle() {
@@ -50,30 +50,9 @@ public class horrorMovie {
         return dateWatched;
     }
 
-    //Setters for all fields in my horror movie object
+    //Setter for all required fields in my horror movie object
     public void setTitle(String title) {
         this.title = title;
-    }
-    public void setDirector(String director) {
-        this.director = director;
-    }
-    public void setReleaseYear(int releaseYear) {
-        this.releaseYear = releaseYear;
-    }
-    public void setRuntimeMinutes(int runtimeMinutes) {
-        this.runtimeMinutes = runtimeMinutes;
-    }
-    public void setStreamingPlatform(String streamingPlatform) {
-        this.streamingPlatform = streamingPlatform;
-    }
-    public void setRating(double rating) {
-        this.rating = rating;
-    }
-    public void setTags(String tags) {
-        this.tags = tags;
-    }
-    public void setDateWatched(String dateWatched) {
-        this.dateWatched = dateWatched;
     }
 
     //Override the toString to show data in a certain manner
