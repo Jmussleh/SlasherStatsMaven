@@ -5,11 +5,19 @@ import com.slasherstats.model.HorrorMovieSQL;
 import com.slasherstats.model.horrorMovie;
 import com.slasherstats.service.slasherStatsManager;
 //Used for Spring
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import java.beans.PropertyEditorSupport;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 //Tells Spring to treat this class as the controller
 /**
@@ -37,6 +45,28 @@ public class MovieController {
         model.addAttribute("movie", new horrorMovie());
         model.addAttribute("accountPoints", manager.getAccountPoints());
         return "index";
+    }
+
+    //Adds a single movie manually
+    /**
+     * Handles adding a new movie manually via form input.
+     *
+     * @param movie the movie object submitted via form
+     * @param model the model object (not used in this method)
+     * @return redirect to the main movie list page
+     */
+    @PostMapping("/addMovie")
+    public String addMovie(@Valid @ModelAttribute("movie") HorrorMovieSQL movie,
+                           BindingResult result,
+                           Model model) {
+        if (result.hasErrors()) {
+            model.addAttribute("movies", manager.viewMovies());
+            model.addAttribute("accountPoints", manager.getAccountPoints());
+            return "index";
+        }
+
+        manager.addMovie(movie);
+        return "redirect:/";
     }
 
     //Handles the POST upload request when a movie file is uploaded
@@ -69,21 +99,6 @@ public class MovieController {
         return "redirect:/";
     }
 
-    //Adds a single movie manually
-    /**
-     * Handles adding a new movie manually via form input.
-     *
-     * @param movie the movie object submitted via form
-     * @param model the model object (not used in this method)
-     * @return redirect to the main movie list page
-     */
-    @PostMapping("/addMovie")
-    //Form fields are connected to horrorMovie object
-    public String addMovie(@ModelAttribute HorrorMovieSQL movie, Model model) {
-        manager.addMovie(movie);
-        //Redirects to homepage and refreshes movie list
-        return "redirect:/";
-    }
 
     /**
      * Deletes a movie using its title from the path variable.
@@ -170,5 +185,37 @@ public class MovieController {
         manager.updateMovie(movie);
         //Redirects to homepage and refreshes movie list
         return "redirect:/";
+    }
+
+    //Converts certain fields before processing
+    /**
+     * Initializes a custom data binder for web requests.
+     * <p>
+     * This method registers a custom editor to handle the conversion of
+     * date strings in the format {@code MM-DD-YYYY} into LocalDate
+     * objects. If the input string cannot be parsed into a valid date,
+     * the value is set to {@code null}, which allows validation annotations
+     * such as {@code @NotNull} to trigger appropriate error messages.
+     *
+     * @param binder allows customization of data binding for web requests
+     */
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        //Tells the program how the date is formatted
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        //Converts LocalDate with this logic. String to LocalDate.
+        binder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                try {
+                    //Sets LocalDate value if parsing succeeds
+                    setValue(LocalDate.parse(text, formatter));
+                    //If the date is incorrect it will throw an error.
+                } catch (DateTimeParseException e) {
+                    // Invalid date will set null
+                    setValue(null);
+                }
+            }
+        });
     }
 }

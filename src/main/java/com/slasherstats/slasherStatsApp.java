@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -92,13 +95,17 @@ public class slasherStatsApp implements CommandLineRunner {
                         case 5 -> existing.setStreamingPlatform(newValue);
                         case 6 -> existing.setRating(Double.parseDouble(newValue));
                         case 7 -> existing.setTags(newValue);
-                        case 8 -> existing.setDateWatched(newValue);
-                        //If any inputs are invalid show this message
-                        default -> {
-                            System.out.println("Invalid field.");
-                            continue;
+                        case 8 -> {
+                            try {
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                                LocalDate parsedDate = LocalDate.parse(newValue, formatter);
+                                existing.setDateWatched(parsedDate);
+                            } catch (DateTimeParseException e) {
+                                System.out.println("Invalid date format. Please use DD-MM-YYYY.");
+                                continue;
+                            }
                         }
-                    }
+                        }
                     boolean updateFieldSuccess = appManager.updateMovie(existing);
                     System.out.println(updateFieldSuccess ? "Movie updated." : "Update failed.");
                     break;
@@ -142,31 +149,42 @@ public class slasherStatsApp implements CommandLineRunner {
         try {
             System.out.print("Enter movie title: ");
             String title = scanner.nextLine();
+
             System.out.print("Enter movie director: ");
             String director = scanner.nextLine();
+
             System.out.print("Enter year of release: ");
             int year = Integer.parseInt(scanner.nextLine());
+
             System.out.print("Enter runtime minutes: ");
             int runtimeMinutes = Integer.parseInt(scanner.nextLine());
+
             System.out.print("Enter streaming platform: ");
             String platform = scanner.nextLine();
+
             System.out.print("Enter rating (0.0 - 10.0): ");
-            //Input validation for rating. Must be between 0.0 and 10.0 or get a message.
             double rating = Double.parseDouble(scanner.nextLine());
             if (rating < 0.0 || rating > 10.0) {
                 System.out.println("Invalid rating range.");
                 return null;
             }
+
             System.out.print("Enter tags: ");
             String tags = scanner.nextLine();
-            System.out.print("Enter date watched (MM-DD-YYYY): ");
-            //Input validation for date. If date is incorrect show this message.
-            String date = scanner.nextLine();
-            if (!slasherStatsManager.isValidDate(date)) {
+
+            System.out.print("Enter date watched (DD-MM-YYYY): ");
+            String dateInput = scanner.nextLine();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate dateWatched;
+            try {
+                dateWatched = LocalDate.parse(dateInput, formatter);
+            } catch (DateTimeParseException e) {
                 System.out.println("Invalid date format.");
                 return null;
             }
-            //Creates a horrormoviesql object if all fields are valid.
+
+            // Creates and populates the HorrorMovieSQL object
             HorrorMovieSQL movie = new HorrorMovieSQL();
             movie.setTitle(title);
             movie.setDirector(director);
@@ -175,10 +193,10 @@ public class slasherStatsApp implements CommandLineRunner {
             movie.setStreamingPlatform(platform);
             movie.setRating(rating);
             movie.setTags(tags);
-            movie.setDateWatched(date);
+            movie.setDateWatched(dateWatched);
 
             return movie;
-        //If there is an invalid field this message is shown.
+
         } catch (Exception e) {
             System.out.println("Invalid input.");
             return null;

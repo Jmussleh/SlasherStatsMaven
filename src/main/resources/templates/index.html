@@ -3,6 +3,13 @@
 <head>
     <!--Sets the main title of the application -->
     <title>Slasher Stats</title>
+    <style>
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 <body>
 <h1>Slasher Stats</h1>
@@ -22,15 +29,36 @@
 <!-- Form for the user to manually add a single movie -->
 <!-- Asks the user for every field for the horrorMovie object-->
 <h2>Add Movie</h2>
-<form th:action="@{/addMovie}" method="post" th:object="${movie}">
-    <label>Title: <input type="text" th:field="*{title}" /></label><br>
-    <label>Director: <input type="text" th:field="*{director}" /></label><br>
-    <label>Year: <input type="number" th:field="*{releaseYear}" /></label><br>
-    <label>Runtime: <input type="number" th:field="*{runtimeMinutes}" /></label><br>
-    <label>Platform: <input type="text" th:field="*{streamingPlatform}" /></label><br>
-    <label>Rating: <input type="number" step="0.1" th:field="*{rating}" /></label><br>
-    <label>Tags: <input type="text" th:field="*{tags}" /></label><br>
-    <label>Date: <input type="text" th:field="*{dateWatched}" placeholder="MM-DD-YYYY" /></label><br>
+<form action="#" th:action="@{/addMovie}" th:object="${movie}" method="post">
+    <label>Title:</label>
+    <input type="text" th:field="*{title}" />
+    <div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error"></div>
+
+    <label>Director:</label>
+    <input type="text" th:field="*{director}" />
+    <div th:if="${#fields.hasErrors('director')}" th:errors="*{director}" class="error"></div>
+
+    <label>Year:</label>
+    <input type="number" th:field="*{releaseYear}" />
+    <div th:if="${#fields.hasErrors('releaseYear')}" th:errors="*{releaseYear}" class="error"></div>
+
+    <label>Runtime:</label>
+    <input type="number" th:field="*{runtimeMinutes}" />
+    <div th:if="${#fields.hasErrors('runtimeMinutes')}" th:errors="*{runtimeMinutes}" class="error"></div>
+
+    <label>Platform:</label>
+    <input type="text" th:field="*{streamingPlatform}" />
+    <div th:if="${#fields.hasErrors('streamingPlatform')}" th:errors="*{streamingPlatform}" class="error"></div>
+
+    <label>Rating:</label>
+    <input type="number" step="0.1" th:field="*{rating}" />
+    <div th:if="${#fields.hasErrors('rating')}" th:errors="*{rating}" class="error"></div>
+
+    <label>Tags:</label>
+    <input type="text" th:field="*{tags}" />
+
+    <input type="text" th:field="*{dateWatched}" placeholder="MM-DD-YYYY" />
+    <div th:if="${#fields.hasErrors('dateWatched')}" th:errors="*{dateWatched}" class="error"></div>
 
     <button type="submit">Add Movie</button>
 </form>

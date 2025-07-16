@@ -16,8 +16,6 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -65,9 +63,13 @@ public class slasherStatsManager {
      */
     public boolean addMovie(HorrorMovieSQL movie) {
         if (movie == null) return false;
-        if (!isValidDate(movie.getDateWatched())) return false;
+        // Validate date
+        if (movie.getDateWatched() == null) return false;
+        // Validate rating
         if (movie.getRating() < 0.0 || movie.getRating() > 10.0) return false;
+        //Add movie to repository
         repository.save(movie);
+        //Add points to account points
         accountPoints += 10;
         return true;
     }
@@ -81,27 +83,50 @@ public class slasherStatsManager {
      *  * @throws java.lang.NumberFormatException if numeric parsing fails for rating
      */
     public List<HorrorMovieSQL> addBulkMovies(MultipartFile file) {
+        //List to hold all added movies
         List<HorrorMovieSQL> added = new ArrayList<>();
+        //Define the expected date format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
+            //Reads the file line by line
             while ((line = reader.readLine()) != null) {
+                //Splits the lines into its fields using ,
                 String[] fields = line.split(",");
+                //Skip any lines that do not meet the field count requirement
                 if (fields.length != 8) continue;
-                try {
-                    HorrorMovieSQL movie = new HorrorMovieSQL(fields[0].trim(), fields[1].trim(), Integer.parseInt(fields[2].trim()),
-                            Integer.parseInt(fields[3].trim()), fields[4].trim(), Double.parseDouble(fields[5].trim()),
-                            fields[6].trim(), fields[7].trim());
 
-                    if (isValidDate(movie.getDateWatched()) && movie.getRating() >= 0.0 && movie.getRating() <= 10.0) {
+                try {
+                    //Separates all fields
+                    String title = fields[0].trim();
+                    String director = fields[1].trim();
+                    int releaseYear = Integer.parseInt(fields[2].trim());
+                    int runtime = Integer.parseInt(fields[3].trim());
+                    String platform = fields[4].trim();
+                    double rating = Double.parseDouble(fields[5].trim());
+                    String tags = fields[6].trim();
+                    LocalDate dateWatched = LocalDate.parse(fields[7].trim(), formatter);
+                    //Rating validation check
+                    if (rating >= 0.0 && rating <= 10.0) {
+                        //If validation passes, create horror movie object
+                        HorrorMovieSQL movie = new HorrorMovieSQL(
+                                title, director, releaseYear, runtime, platform, rating, tags, dateWatched
+                        );
+                        //save the movie and add points to account
                         repository.save(movie);
                         accountPoints += 10;
                         added.add(movie);
                     }
-                } catch (Exception ignored) {}
+                //If validation fails, ignore the line
+                } catch (Exception ignored) {
+                }
             }
+        //Handles the file reading errors
         } catch (Exception e) {
             System.out.println("Error reading MultipartFile: " + e.getMessage());
         }
+        //Return list of movies
         return added;
     }
 
@@ -115,26 +140,43 @@ public class slasherStatsManager {
      */
     public List<HorrorMovieSQL> addBulkMovies(String filename) {
         List<HorrorMovieSQL> added = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
         try (Scanner fileScanner = new Scanner(new File(filename))) {
             while (fileScanner.hasNextLine()) {
                 String line = fileScanner.nextLine();
                 String[] fields = line.split(",");
+                //Skip any lines that do not meet the field count requirement
                 if (fields.length != 8) continue;
-                try {
-                    HorrorMovieSQL movie = new HorrorMovieSQL(fields[0].trim(), fields[1].trim(), Integer.parseInt(fields[2].trim()),
-                            Integer.parseInt(fields[3].trim()), fields[4].trim(), Double.parseDouble(fields[5].trim()),
-                            fields[6].trim(), fields[7].trim());
 
-                    if (isValidDate(movie.getDateWatched()) && movie.getRating() >= 0.0 && movie.getRating() <= 10.0) {
+                try {
+                    //Separates all fields
+                    String title = fields[0].trim();
+                    String director = fields[1].trim();
+                    int releaseYear = Integer.parseInt(fields[2].trim());
+                    int runtime = Integer.parseInt(fields[3].trim());
+                    String platform = fields[4].trim();
+                    double rating = Double.parseDouble(fields[5].trim());
+                    String tags = fields[6].trim();
+                    LocalDate dateWatched = LocalDate.parse(fields[7].trim(), formatter);
+                    //Rating validation check
+                    if (rating >= 0.0 && rating <= 10.0) {
+                        //If validation passes, create horror movie object
+                        HorrorMovieSQL movie = new HorrorMovieSQL(
+                                title, director, releaseYear, runtime, platform, rating, tags, dateWatched
+                        );
+                        //save the movie and add points to account
                         repository.save(movie);
                         accountPoints += 10;
                         added.add(movie);
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         } catch (Exception e) {
             System.out.println("Error reading file: " + e.getMessage());
         }
+        //Return list of movies
         return added;
     }
 
@@ -148,9 +190,13 @@ public class slasherStatsManager {
         HorrorMovieSQL existingMovie = repository.findByTitleIgnoreCase(updatedMovie.getTitle());
         if (existingMovie == null) return false;
 
-        if (!isValidDate(updatedMovie.getDateWatched())) return false;
+        // Validate date is present
+        if (updatedMovie.getDateWatched() == null) return false;
+
+        // Validate rating
         if (updatedMovie.getRating() < 0.0 || updatedMovie.getRating() > 10.0) return false;
 
+        // Update fields
         existingMovie.setDirector(updatedMovie.getDirector());
         existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
         existingMovie.setRuntimeMinutes(updatedMovie.getRuntimeMinutes());
@@ -181,21 +227,4 @@ public class slasherStatsManager {
         return repository.findByTitleIgnoreCase(title);
     }
 
-    /**
-     * Validates a date string to ensure it matches the format MM-dd-yyyy.
-     *
-     * @param date the date string to validate
-     * @return true if the date is valid, false otherwise
-     * @throws java.time.format.DateTimeParseException if the date format is invalid or unresolvable
-     */
-    public static boolean isValidDate(String date) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-uuuu")
-                    .withResolverStyle(ResolverStyle.STRICT);
-            LocalDate.parse(date, formatter);
-            return true;
-        } catch (DateTimeParseException e) {
-            return false;
-        }
-    }
 }
