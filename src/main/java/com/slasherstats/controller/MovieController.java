@@ -192,7 +192,7 @@ public class MovieController {
      * Initializes a custom data binder for web requests.
      * <p>
      * This method registers a custom editor to handle the conversion of
-     * date strings in the format {@code MM-DD-YYYY} into LocalDate
+     * date strings in the format {@code MM-DD-YYYY} into Localdate
      * objects. If the input string cannot be parsed into a valid date,
      * the value is set to {@code null}, which allows validation annotations
      * such as {@code @NotNull} to trigger appropriate error messages.
