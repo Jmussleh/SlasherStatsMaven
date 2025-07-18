@@ -1,0 +1,6 @@
+com.slasherstats
+com.slasherstats.config
+com.slasherstats.controller
+com.slasherstats.model
+com.slasherstats.repository
+com.slasherstats.service

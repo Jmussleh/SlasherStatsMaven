@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.slasherstats"},{"l":"com.slasherstats.config"},{"l":"com.slasherstats.controller"},{"l":"com.slasherstats.model"},{"l":"com.slasherstats.repository"},{"l":"com.slasherstats.service"}];updateSearchResults();
