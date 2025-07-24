@@ -8,10 +8,13 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 /**
  * Unit tests for the {@link slasherStatsManager} service using mocked {@link HorrorMovieRepository}.
  */
@@ -19,65 +22,47 @@ public class slasherStatsTests {
 
     private HorrorMovieRepository mockRepository;
     private slasherStatsManager appManager;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
 
-    /**
-     * Sets up a mocked HorrorMovieRepository and injects it into the service before each test.
-     */
     @BeforeEach
     public void setUp() {
         mockRepository = mock(HorrorMovieRepository.class);
         appManager = new slasherStatsManager(mockRepository);
     }
-
-    /**
-     * Tests that a valid movie is added successfully and saved in the repository.
-     */
+    //Unit test for add movie success
     @Test
     public void testAddMovieSuccess() {
-        HorrorMovieSQL movie = new HorrorMovieSQL("Scream", "Wes Craven", 1996, 111, "HBO Max", 7.8, "slasher", "10-30-2021");
+        LocalDate dateWatched = LocalDate.parse("10-30-2021", formatter);
+        HorrorMovieSQL movie = new HorrorMovieSQL("Scream", "Wes Craven", 1996, 111, "HBO Max", 7.8, "slasher", dateWatched);
         boolean result = appManager.addMovie(movie);
         verify(mockRepository, times(1)).save(movie);
         assertTrue(result);
     }
-
-
-    /**
-     * Tests that attempting to add a null movie fails and returns false.
-     */
+    //Unit test for add movie fail
     @Test
     public void testAddMovieFail() {
         boolean result = appManager.addMovie(null);
         assertFalse(result);
     }
-
-    /**
-     * Tests successful deletion of a movie that exists in the repository.
-     */
+    //Unit test for delete movie success
     @Test
     public void testDeleteMovieSuccess() {
-        HorrorMovieSQL movie = new HorrorMovieSQL("The Thing", "John Carpenter", 1982, 109, "Shudder", 8.2, "creature", "11-05-2020");
+        LocalDate dateWatched = LocalDate.parse("11-05-2020", formatter);
+        HorrorMovieSQL movie = new HorrorMovieSQL("The Thing", "John Carpenter", 1982, 109, "Shudder", 8.2, "creature", dateWatched);
         when(mockRepository.findByTitleIgnoreCase("The Thing")).thenReturn(movie);
 
         boolean result = appManager.deleteMovie("The Thing");
         verify(mockRepository, times(1)).delete(movie);
         assertTrue(result);
     }
-
-    /**
-     * Tests that deleting a nonexistent movie returns false and does not affect the repository.
-     */
+    //Unit test for delete movie fail
     @Test
     public void testDeleteMovieFail() {
         when(mockRepository.findByTitleIgnoreCase("Nonexistent")).thenReturn(null);
         boolean result = appManager.deleteMovie("Nonexistent");
         assertFalse(result);
     }
-
-    /**
-     * Tests bulk uploading movies from a valid test file.
-     *
-     * @throws Exception if writing the test file fails
-     */
+    //Unit test for testing successful bulk movie add
     @Test
     public void testBulkMoviesSuccess() throws Exception {
         String filename = "test_bulk_movies.txt";
@@ -88,24 +73,19 @@ public class slasherStatsTests {
         List<HorrorMovieSQL> added = appManager.addBulkMovies(filename);
         assertEquals(2, added.size());
     }
-
-    /**
-     * Tests that uploading from a non-existent or invalid file returns an empty list.
-     */
+    //Unit test for bulk movie add failure
     @Test
     public void testBulkMoviesFailure() {
         List<HorrorMovieSQL> added = appManager.addBulkMovies("randomfile.txt");
         assertEquals(0, added.size());
     }
-
-    /**
-     * Tests that account points increase correctly when movies are added,
-     * and decrease when a movie is deleted.
-     */
+    //Unit test for adding and subtraction account points
     @Test
     public void testAccountPointsAddAndSubtract() {
-        HorrorMovieSQL movie1 = new HorrorMovieSQL("Hereditary", "Ari Aster", 2018, 127, "Max", 7.3, "supernatural", "10-15-2022");
-        HorrorMovieSQL movie2 = new HorrorMovieSQL("Midsommar", "Ari Aster", 2019, 148, "Hulu", 7.1, "folk", "10-16-2022");
+        LocalDate date1 = LocalDate.parse("10-15-2022", formatter);
+        LocalDate date2 = LocalDate.parse("10-16-2022", formatter);
+        HorrorMovieSQL movie1 = new HorrorMovieSQL("Hereditary", "Ari Aster", 2018, 127, "Max", 7.3, "supernatural", date1);
+        HorrorMovieSQL movie2 = new HorrorMovieSQL("Midsommar", "Ari Aster", 2019, 148, "Hulu", 7.1, "folk", date2);
 
         when(mockRepository.findByTitleIgnoreCase("Hereditary")).thenReturn(movie1);
         when(mockRepository.findByTitleIgnoreCase("Midsommar")).thenReturn(movie2);
@@ -121,13 +101,11 @@ public class slasherStatsTests {
         appManager.deleteMovie("Hereditary");
         assertEquals(10, appManager.getAccountPoints());
     }
-
-    /**
-     * Tests that account points are decremented only when a movie is found and deleted.
-     */
+    //Unit test for adding and subtraction account points
     @Test
     public void testAccountPointsSubtract() {
-        HorrorMovieSQL movie = new HorrorMovieSQL("Movie", "Director", 2025, 100, "Platform", 5.0, "tag", "06-25-2025");
+        LocalDate dateWatched = LocalDate.parse("06-25-2025", formatter);
+        HorrorMovieSQL movie = new HorrorMovieSQL("Movie", "Director", 2025, 100, "Platform", 5.0, "tag", dateWatched);
         when(mockRepository.findByTitleIgnoreCase("Movie")).thenReturn(movie);
 
         appManager.addMovie(movie);
