@@ -188,15 +188,11 @@ public class slasherStatsManager {
      */
     public boolean updateMovie(HorrorMovieSQL updatedMovie) {
         HorrorMovieSQL existingMovie = repository.findByTitleIgnoreCase(updatedMovie.getTitle());
-        if (existingMovie == null) return false;
+        if (existingMovie == null) {
+            System.out.println("Movie not found.");
+            return false;
+        }
 
-        // Validate date is present
-        if (updatedMovie.getDateWatched() == null) return false;
-
-        // Validate rating
-        if (updatedMovie.getRating() < 0.0 || updatedMovie.getRating() > 10.0) return false;
-
-        // Update fields
         existingMovie.setDirector(updatedMovie.getDirector());
         existingMovie.setReleaseYear(updatedMovie.getReleaseYear());
         existingMovie.setRuntimeMinutes(updatedMovie.getRuntimeMinutes());
@@ -206,6 +202,7 @@ public class slasherStatsManager {
         existingMovie.setDateWatched(updatedMovie.getDateWatched());
 
         repository.save(existingMovie);
+        System.out.println("Movie updated successfully.");
         return true;
     }
 
@@ -225,6 +222,11 @@ public class slasherStatsManager {
      */
     public HorrorMovieSQL findMovie(String title) {
         return repository.findByTitleIgnoreCase(title);
+    }
+
+    public int recalculatePoints() {
+        this.accountPoints = repository.findAll().size() * 10;
+        return this.accountPoints;
     }
 
 }

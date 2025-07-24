@@ -41,6 +41,7 @@ public class MovieController {
      */
     @GetMapping
     public String index(Model model) {
+        manager.recalculatePoints(); // Add this
         model.addAttribute("movies", manager.viewMovies());
         model.addAttribute("movie", new horrorMovie());
         model.addAttribute("accountPoints", manager.getAccountPoints());
@@ -99,21 +100,28 @@ public class MovieController {
         return "redirect:/";
     }
 
-
     /**
      * Deletes a movie using its title from the path variable.
      *
      * @param title the title of the movie to delete
      * @return redirect to the main page after deletion
      */
-    @PostMapping("/delete/{title}")
-    public String deleteMovie(@PathVariable String title) {
-        //deletes the movie by title search
-        manager.deleteMovie(title);
-        //Redirects to homepage and refreshes movie list
+    @GetMapping("/delete")
+    public String deleteMovie(@RequestParam("title") String title, Model model) {
+        HorrorMovieSQL movie = manager.findMovie(title);
+
+        if (movie == null) {
+            model.addAttribute("movies", manager.viewMovies());
+            model.addAttribute("movie", new HorrorMovieSQL());
+            model.addAttribute("error", "Movie with title '" + title + "' not found.");
+
+            return "index";
+        }
+
+        manager.deleteMovie(movie.getTitle());
+        model.addAttribute("message", "Movie deleted successfully.");
         return "redirect:/";
     }
-
     /**
      * Searches for a movie by title and displays the delete confirmation page.
      *
@@ -123,16 +131,17 @@ public class MovieController {
      */
     @GetMapping("/searchToDelete")
     public String searchToDelete(@RequestParam String title, Model model) {
-        HorrorMovieSQL movie = manager.findMovie(title);
-        //If the movie isn't found return an error and return home
-        if (movie == null) {
-            model.addAttribute("error", "Movie not found");
+        HorrorMovieSQL found = manager.findMovie(title);
+
+        if (found == null) {
+            model.addAttribute("deleteError", "Movie with title '" + title + "' not found.");
             model.addAttribute("movies", manager.viewMovies());
+            model.addAttribute("movie", new HorrorMovieSQL()); // prevent Thymeleaf binding error
             return "index";
         }
-        //If the movie is found return confirmDelete.html
-        model.addAttribute("movie", movie);
-        return "confirmDelete";
+
+        manager.deleteMovie(title);
+        return "redirect:/";
     }
 
     //Deletes the title after the user confirms the deletion. Returns home after deletion
@@ -143,12 +152,17 @@ public class MovieController {
      * @return redirect to the main movie list page
      */
     @PostMapping("/deleteConfirmed")
-    public String deleteConfirmed(@RequestParam String title) {
+    public String deleteConfirmed(@RequestParam String title, Model model) {
+        HorrorMovieSQL movie = manager.findMovie(title);
+        if (movie == null) {
+            model.addAttribute("error", "Movie with title '" + title + "' not found.");
+            model.addAttribute("movies", manager.viewMovies());
+            return "index";
+        }
+
         manager.deleteMovie(title);
-        //Redirects to homepage and refreshes movie list
         return "redirect:/";
     }
-
     //Shows update form for movie
     /**
      * Displays the movie update form for a specific title.
@@ -159,15 +173,15 @@ public class MovieController {
      */
     @GetMapping("/update")
     public String showUpdateForm(@RequestParam String title, Model model) {
-        //Finds the movie by title
         HorrorMovieSQL movie = manager.findMovie(title);
-        //If the movie isn;t found go to home page with an error
         if (movie == null) {
-            model.addAttribute("error", "Movie not found");
+            model.addAttribute("updateError", "Movie with title '" + title + "' not found.");
             model.addAttribute("movies", manager.viewMovies());
+
+            model.addAttribute("movie", new HorrorMovieSQL());
+
             return "index";
         }
-        //If the movie is found show the updateMovie.html form
         model.addAttribute("movie", movie);
         return "updateMovie";
     }
@@ -179,13 +193,26 @@ public class MovieController {
      * @param movie the updated movie object
      * @return redirect to the main movie list page
      */
-    @PostMapping("/updateMovie")
-    public String updateMovie(@ModelAttribute HorrorMovieSQL movie) {
-        //Uses this method to update and save the changes
-        manager.updateMovie(movie);
-        //Redirects to homepage and refreshes movie list
+    @PostMapping("/update")
+    public String processUpdate(@ModelAttribute("movie") HorrorMovieSQL movie, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            System.out.println("Binding errors:");
+            result.getFieldErrors().forEach(e -> {
+                System.out.printf(" - %s: %s%n", e.getField(), e.getDefaultMessage());
+            });
+        }
+
+        boolean success = manager.updateMovie(movie);
+
+        if (!success) {
+            model.addAttribute("error", "Update failed. Check required fields and formatting.");
+            model.addAttribute("movie", movie);
+            return "updateMovie";
+        }
+
         return "redirect:/";
     }
+
 
     //Converts certain fields before processing
     /**
@@ -202,7 +229,7 @@ public class MovieController {
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         //Tells the program how the date is formatted
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         //Converts LocalDate with this logic. String to LocalDate.
         binder.registerCustomEditor(LocalDate.class, new PropertyEditorSupport() {
             @Override

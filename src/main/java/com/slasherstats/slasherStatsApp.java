@@ -2,7 +2,6 @@
 package com.slasherstats;
 
 import com.slasherstats.model.HorrorMovieSQL;
-import com.slasherstats.repository.HorrorMovieRepository;
 import com.slasherstats.service.slasherStatsManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,6 +13,7 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
+
 //This class is marked as a spring bean so it can be discovered by spring.
 //This class will run a method when the app starts.
 @Component
@@ -21,12 +21,14 @@ public class slasherStatsApp implements CommandLineRunner {
     //Used to access the CRUD operations and reading input from the user console.
     private final slasherStatsManager appManager;
     private final Scanner scanner;
+
     //Sccanner is initialized.
     @Autowired
     public slasherStatsApp(slasherStatsManager appManager) {
         this.appManager = appManager;
         this.scanner = new Scanner(System.in);
     }
+
     //Method is run once the application starts
     @Override
     public void run(String... args) {
@@ -105,7 +107,7 @@ public class slasherStatsApp implements CommandLineRunner {
                                 continue;
                             }
                         }
-                        }
+                    }
                     boolean updateFieldSuccess = appManager.updateMovie(existing);
                     System.out.println(updateFieldSuccess ? "Movie updated." : "Update failed.");
                     break;
@@ -132,6 +134,7 @@ public class slasherStatsApp implements CommandLineRunner {
             }
         }
     }
+
     //The SlasherStats app menu displayed in the CLI when the app runs
     private void displayMenu() {
         System.out.println("\n---*Welcome to the SlasherStats App*---");
@@ -144,6 +147,7 @@ public class slasherStatsApp implements CommandLineRunner {
         System.out.println("7. Exit");
         System.out.print("Enter your choice: ");
     }
+
     //Fields that are shown for user to input when adding a single movie.
     private HorrorMovieSQL movieFields() {
         try {
@@ -172,10 +176,10 @@ public class slasherStatsApp implements CommandLineRunner {
             System.out.print("Enter tags: ");
             String tags = scanner.nextLine();
 
-            System.out.print("Enter date watched (DD-MM-YYYY): ");
+            System.out.print("Enter date watched (YYYY-MM-DD): ");
             String dateInput = scanner.nextLine();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate dateWatched;
             try {
                 dateWatched = LocalDate.parse(dateInput, formatter);
@@ -184,18 +188,8 @@ public class slasherStatsApp implements CommandLineRunner {
                 return null;
             }
 
-            // Creates and populates the HorrorMovieSQL object
-            HorrorMovieSQL movie = new HorrorMovieSQL();
-            movie.setTitle(title);
-            movie.setDirector(director);
-            movie.setReleaseYear(year);
-            movie.setRuntimeMinutes(runtimeMinutes);
-            movie.setStreamingPlatform(platform);
-            movie.setRating(rating);
-            movie.setTags(tags);
-            movie.setDateWatched(dateWatched);
-
-            return movie;
+            //Use user-provided and parsed data to build the movie
+            return new HorrorMovieSQL(title, director, year, runtimeMinutes, platform, rating, tags, dateWatched);
 
         } catch (Exception e) {
             System.out.println("Invalid input.");

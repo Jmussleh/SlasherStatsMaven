@@ -42,8 +42,9 @@ public class HorrorMovieSQL {
     @NotNull(message = "Date is required and must be in MM-DD-YYYY format.")
     private LocalDate dateWatched;
 
-    // Constructor for JPA.
-    public HorrorMovieSQL() {}
+    public HorrorMovieSQL() {
+        // Required by JPA for Hibernate to instantiate the object
+    }
 
     //Constructs a HorrorMovieSQL object with these fields
     public HorrorMovieSQL(String title, String director, int releaseYear, int runtimeMinutes,

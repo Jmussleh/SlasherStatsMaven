@@ -57,7 +57,7 @@
     <label>Tags:</label>
     <input type="text" th:field="*{tags}" />
 
-    <input type="text" th:field="*{dateWatched}" placeholder="MM-DD-YYYY" />
+    <input type="text" th:field="*{dateWatched}" placeholder="YYYY-MM-DD" />
     <div th:if="${#fields.hasErrors('dateWatched')}" th:errors="*{dateWatched}" class="error"></div>
 
     <button type="submit">Add Movie</button>
@@ -83,14 +83,20 @@
 <!--Allows the user to update a movie field by entering the title.
  The user can update any field in this form.-->
 <h2>Update Movie by Title</h2>
+<!-- Error specific to update -->
+<div th:if="${updateError}" class="alert alert-danger">
+    <p th:text="${updateError}" style="color: red;"></p>
+</div>
 <form th:action="@{/update}" method="get">
     <input type="text" name="title" placeholder="Enter title to update" required />
     <button type="submit">Update</button>
 </form>
 
-<!-- Allows the user to search for a movie to delete by its title -->
 <h2>Delete Movie by Title</h2>
-<!-- calls for the action searchToDelete using thymeleaf-->
+<!-- Error specific to delete -->
+<div th:if="${deleteError}" class="alert alert-danger">
+    <p th:text="${deleteError}" style="color: red;"></p>
+</div>
 <form th:action="@{/searchToDelete}" method="get">
     <input type="text" name="title" placeholder="Enter title to delete" required />
     <button type="submit">Delete</button>
